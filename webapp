@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подписание договора</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <h2>Подписание договора</h2>
+    <iframe id="document-viewer" width="100%" height="500px"></iframe>
+    <button onclick="signDocument()">Подписать</button>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        let urlParams = new URLSearchParams(window.location.search);
+        let contractId = urlParams.get("contract_id");
+        let contractUrl = urlParams.get("contract_url");
+
+        document.getElementById("document-viewer").src = contractUrl;
+
+        function signDocument() {
+            fetch("/sign", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contract_id: contractId, user_id: tg.initDataUnsafe.user.id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("Документ подписан!");
+                tg.close();
+            });
+        }
+    </script>
+</body>
+</html>
